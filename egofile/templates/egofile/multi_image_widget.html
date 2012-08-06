@@ -1,0 +1,134 @@
+{% load static %}
+{% load adminmedia i18n %}
+
+<input type="hidden" id="id_{{name}}" name="{{name}}" value="{{value}}"/>
+
+<style type="text/css">
+.multi_image_toolbar{
+    padding:5px;
+    background:#eee;
+    border:1px solid #ccc;
+    float:left;
+    margin-top:10px;
+    border-bottom:none;
+    margin-right:3px;
+}
+.images_container{
+    padding:10px;
+    background:#f9f9f9;
+    border:1px solid #ccc;
+}
+.clearfix{
+    display:block;
+    clear:both;
+}
+.image_item{
+    float:left;
+    padding:10px;
+    background:#fff;
+    border:1px solid #ddd;
+    margin-right:10px;
+    text-align:center;
+    margin-bottom:10px;
+}
+a.{{name}}_delete_single_link{
+    display:block;
+    text-align:center;
+    border-top:1px solid #ddd;
+    margin-top:5px;
+    padding-top:5px;
+    color:red;
+}
+</style>
+<script type="text/javascript" src="{% admin_media_prefix %}egofile/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}egofile/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    //Drag and Drop actions
+	$( "#{{name}}_imgs" ).sortable({
+            stop: function(event, ui) {
+                images_parser_{{name}}();
+            }
+    });
+});
+
+function setMultipleImage_{{name}}(field_name, data){
+    var field_id = 'id_'+field_name;
+    var img_id = ego_randomizer();
+    var html = '<div class="image_item" id="{{name}}_item_'+img_id+'">\
+    <a href="javascript:;" title="Click and drag to new position">\
+    <img src="{% get_media_prefix%}'+data+'" height="150" class="{{name}}_the_item" rel="'+data+'"/>\
+    <div style="padding:3px 0;">'+data+'</div></a>\
+    <a href="javascript:deleteSingle_{{name}}(\'{{name}}_item_'+img_id+'\');" title="Delete" class="{{name}}_delete_single_link">\
+    <img src="{{STATIC_URL}}img/admin/icon_deletelink.gif" width="10" height="10"/> {% trans 'Delete' %}</a></div>';
+    
+    {% if not is_single %}
+    django.jQuery('#{{name}}_imgs').prepend(html);
+    {% else %}
+    django.jQuery('#{{name}}_imgs .image_item').remove();
+    django.jQuery('#{{name}}_imgs').prepend(html);
+    {% endif %}
+    
+    images_parser_{{name}}();
+}
+
+function deleteSingle_{{name}}(item){
+    django.jQuery('#'+item).remove();
+    images_parser_{{name}}();
+}
+
+function images_parser_{{name}}(){
+    var images = new Array();
+    django.jQuery('.{{name}}_the_item').each(function(){
+        var src = django.jQuery(this).attr('rel');
+        images.push(src);
+    });
+    
+    var str_images = images.join('#');
+    django.jQuery('#id_{{name}}').val(str_images);
+}
+
+function clearGallery_{{name}}(){
+    django.jQuery('#id_{{name}}').val('');
+    django.jQuery('#{{name}}_imgs .image_item').remove();
+}
+</script>
+
+<div class="clearfix"></div>
+<div class="multi_image_widget">
+
+<div class="clearfix"></div>
+<div class="multi_image_toolbar">
+<a href="{{filebrowser_url}}" class="add-another" id="add_id_{{name}}" onclick="return showAddAnotherPopup(this);">
+<img src="{{STATIC_URL}}img/admin/icon_addlink.gif" width="10" height="10"/> <strong>{% trans 'Add New Image' %}</strong>
+</a>
+</div>
+
+{% if not is_single %}
+<div class="multi_image_toolbar">
+<a href="javascript:clearGallery_{{name}}();" class="add-another" id="delete_id_{{name}}">
+<img src="{{STATIC_URL}}img/admin/icon_deletelink.gif" width="10" height="10"/> <strong>{% trans 'Delete All Images' %}</strong>
+</a>
+</div>
+{% endif %}
+
+<div class="clearfix"></div>
+<div id="{{name}}_imgs" class="images_container">
+
+{% if images %}
+    {% for image in images %}
+    <div class="image_item" id="{{name}}_item_{{forloop.counter}}" style="cursor:move;">
+    <a href="javascript:;" title="Click and drag to new position">
+    <img src="{% get_media_prefix%}{{image}}" height="150" class="{{name}}_the_item" rel="{{image}}" style="cursor:move;"/>
+    <div style="padding:3px 0;">{{image}}</div>
+    </a>
+    <a href="javascript:deleteSingle_{{name}}('{{name}}_item_{{forloop.counter}}');" title="Delete" class="{{name}}_delete_single_link">
+    <img src="{{STATIC_URL}}img/admin/icon_deletelink.gif" width="10" height="10"/> {% trans 'Delete' %}</a>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="clearfix"></div>
+</div>
+<span class="helptext">{{help_text}}</span>
+</div>

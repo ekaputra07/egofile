@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>File Browser</title>
+{% load adminmedia %}
+{% load static %}
+<link rel="stylesheet" href="{% admin_media_prefix %}egofile/css/egofile.css" type="text/css" />
+<script src="{% admin_media_prefix %}js/jquery.min.js" type="text/javascript"></script>
+<script src="{% admin_media_prefix %}egofile/js/tiny_mce_popup.js" type="text/javascript"></script>
+<script type="text/javascript">
+var ajaxurl = "{% url egofile_ajax %}";
+var delurl = "{% url egofile_ajaxdelete %}";
+var newurl = "{% url egofile_ajaxnew %}";
+var renameurl = "{% url egofile_ajaxrename %}";
+var uploadurl = "{% url egofile_ajaxupload %}";
+var ajaxbreadcrumb = "{% url egofile_breadcrumb %}";
+var staticpath = "{% admin_media_prefix %}";
+var media_url = "{% get_media_prefix %}";
+var csrftoken = "{{csrf_token}}";
+var mode = "{{mode}}";
+
+{% if mode == 'popup' %}
+var field_id = "{{field_id}}";
+var func_name = "{{func_name}}";
+{% endif %}
+
+</script>
+<script src="{% admin_media_prefix %}egofile/js/egofile.js" type="text/javascript"></script>
+
+</head>
+<body id="popup">
+<div class="egofile_container">
+
+<div class="menu">
+<div class="menu-content">
+<h2>File Information</h2>
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td width="3%" valign="top">Name</td><td valign="top">:</td><td class="fname"></td></tr>
+<tr><td valign="top">Size</td><td valign="top">:</td><td class="fsize"></td></tr>
+<tr><td valign="top">Extension</td><td valign="top">:</td><td class="fext"></td></tr>
+<tr><td valign="top">Url</td><td valign="top">:</td><td class="furl"></td></tr>
+<tr><td class="fimg" colspan="3"></td></tr>
+<tr><td class="finsert" colspan="3" align="center"></td></tr>
+</table>
+</div>
+
+<div class="menu-content2">
+<h2>Tools</h2>
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td valign="top" width="10%"><input type="button" value="Create new" class="btn-light" onclick="new_folder();"/></td></tr>
+
+<tr><td colspan="2">Upload File:</td></tr>
+<tr><td valign="top">
+<form action="{% url egofile_ajaxupload %}" method="post" enctype="multipart/form-data" target="upload_target" onsubmit="startUpload();" >
+{% csrf_token %}
+<input name="file" type="file" class="btn-light" style="width:200px;"/>
+<input type="hidden" name="current_path" id="current_path" value=""><br />
+<input type="submit" name="submitBtn" value="Upload" class="btn-light"/>
+</form>
+<iframe id="upload_target" name="upload_target" src="#" style="width:0;height:0;border:0px solid #fff;"></iframe>
+</td></tr>
+
+<tr><td class="upload-status" colspan="2"></td></tr>
+</table>
+</div>
+
+</div><!-- end menu -->
+
+<div class="breadcrumb">
+<ul class="breadcrumb_ul">
+</ul>
+<div style="clear:both;"></div>
+</div>
+
+<div class="files_list">
+<div class="loadingfile"><img src="{% admin_media_prefix %}egofile/images/loading.gif"/> <span>Loading...</span></div>
+<table border="0" cellpadding="0" cellspacing="0" class="filetable">
+</table>
+</div>
+
+</div>
+<body>
+</html>
+
